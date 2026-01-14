@@ -20,7 +20,7 @@ LANGUAGES = {
 }
 
 # Default language
-DEFAULT_LANGUAGE = "zh_TW"
+DEFAULT_LANGUAGE = "zh_CN"
 
 # Current language cache
 _current_language: Optional[str] = None
