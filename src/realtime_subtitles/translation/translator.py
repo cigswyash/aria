@@ -35,19 +35,13 @@ class NLLBTranslator:
     - Automatic model download
     """
     
-    # Available models (OpenNMT official repos)
+    # Available models - aligned with ModelManager
+    # Uses the same model as ModelManager for consistency
     MODELS = {
         "600m": {
-            "repo": "OpenNMT/nllb-200-distilled-600M-ct2-float16",
-            "name": "NLLB-200 600M (fast)",
-        },
-        "1.3b": {
-            "repo": "OpenNMT/nllb-200-distilled-1.3B-ct2-int8",
-            "name": "NLLB-200 1.3B (balanced)",
-        },
-        "3.3b": {
-            "repo": "OpenNMT/nllb-200-3.3B-ct2-int8", 
-            "name": "NLLB-200 3.3B (best quality)",
+            "repo": "JustFrederik/nllb-200-distilled-600M-ct2-int8",
+            "name": "NLLB-200 600M (int8)",
+            "local_folder": "nllb-200-distilled-600M-ct2-int8",
         },
     }
     
@@ -81,7 +75,7 @@ class NLLBTranslator:
     
     def __init__(
         self,
-        model_size: str = "3.3b",
+        model_size: str = "600m",
         target_language: str = "zho_Hant",
         device: str = "auto",
     ):
@@ -112,7 +106,7 @@ class NLLBTranslator:
         
         # Get model path
         model_info = self.MODELS[model_size]
-        model_path = self._get_or_download_model(model_info["repo"])
+        model_path = self._get_or_download_model(model_info)
         
         # Load model
         info(f"Loading NLLB {model_info['name']} on {device}...")
@@ -125,43 +119,50 @@ class NLLBTranslator:
             intra_threads=4,
         )
         
-        # Load tokenizer from original model
+        # Load tokenizer from original model (use project models dir for cache)
         debug("Loading NLLB tokenizer...")
+        tokenizer_cache_dir = self._get_cache_dir() / "nllb-tokenizer"
         self._tokenizer = AutoTokenizer.from_pretrained(
             "facebook/nllb-200-distilled-600M",
             src_lang="jpn_Jpan",  # Default source
+            cache_dir=str(tokenizer_cache_dir),
         )
         
         info(f"NLLB initialized: {model_info['name']}, target={target_language}")
     
     def _get_cache_dir(self) -> Path:
-        """Get the model cache directory."""
-        cache_dir = Path.home() / ".cache" / "nllb200"
+        """Get the model cache directory (project models folder)."""
+        # Use project's models directory for consistency with ModelManager
+        current = Path(__file__).resolve()
+        # Go up: translator.py -> translation -> realtime_subtitles -> src -> project_root
+        project_root = current.parent.parent.parent.parent
+        cache_dir = project_root / "models"
         cache_dir.mkdir(parents=True, exist_ok=True)
         return cache_dir
     
-    def _get_or_download_model(self, repo_id: str) -> Path:
-        """Get model path, downloading if necessary."""
+    def _get_or_download_model(self, model_info: dict) -> Path:
+        """Get model path, checking if already downloaded by ModelManager."""
         cache_dir = self._get_cache_dir()
-        model_name = repo_id.replace("/", "_")
-        model_path = cache_dir / model_name
+        
+        # Use local_folder name (same as ModelManager) for consistency
+        local_folder = model_info.get("local_folder")
+        repo_id = model_info["repo"]
+        
+        if local_folder:
+            model_path = cache_dir / local_folder
+        else:
+            # Fallback to repo name conversion
+            model_path = cache_dir / repo_id.replace("/", "_")
         
         if model_path.exists() and (model_path / "model.bin").exists():
             debug(f"Using cached NLLB model: {model_path}")
             return model_path
         
-        info(f"Downloading NLLB model: {repo_id}")
-        info("This may take a while on first run...")
-        
-        # Download from Hugging Face
-        downloaded_path = snapshot_download(
-            repo_id=repo_id,
-            local_dir=model_path,
-            local_dir_use_symlinks=False,
+        # Model not found - raise error to let user download via ModelManager
+        raise FileNotFoundError(
+            f"NLLB model not found at {model_path}. "
+            f"Please download the model using the Model Manager first."
         )
-        
-        info(f"NLLB model downloaded: {downloaded_path}")
-        return Path(downloaded_path)
     
     def translate(
         self,

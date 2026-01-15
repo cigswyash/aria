@@ -200,19 +200,10 @@ class StreamingAudioBuffer:
                     daemon=True,
                 ).start()
         
-        # Trigger interim results when min duration reached (for lower latency)
-        elif self._speech_started and buffer_duration >= self.min_segment_duration:
-            with self._lock:
-                # Don't reset speech_started - keep accumulating
-                audio_to_process = self._flush_buffer_unlocked()
-            
-            if audio_to_process is not None:
-                print(f"[Buffer] Interim result ({buffer_duration:.1f}s)")
-                threading.Thread(
-                    target=self.on_segment_ready,
-                    args=(audio_to_process,),
-                    daemon=True,
-                ).start()
+        # Note: Removed interim results logic to reduce queue buildup
+        # Transcription now only triggers on:
+        # 1. Speech end (silence detected)
+        # 2. Max duration reached
     
     def reset(self) -> None:
         """Reset buffer state."""

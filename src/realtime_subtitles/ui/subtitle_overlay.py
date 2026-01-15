@@ -90,6 +90,9 @@ class SubtitleOverlay(ctk.CTkToplevel):
         
         # Position after window is ready
         self.after(100, self._position_window)
+        
+        # Start hidden - will be shown when pipeline is ready
+        self.withdraw()
     
     def _on_window_close(self) -> None:
         """Handle window close event (e.g., from taskbar)."""
@@ -226,40 +229,32 @@ class SubtitleOverlay(ctk.CTkToplevel):
         )
         # Don't pack lang_label if empty, only show when has content
         
-        # Original text - use Textbox for proper multiline and wrapping
-        self.subtitle_textbox = ctk.CTkTextbox(
+        # Original text - use Label for static multiline text (no UI wrapping issues)
+        self.subtitle_textbox = ctk.CTkLabel(
             self.container,
+            text="",
             font=ctk.CTkFont(size=24, weight="bold"),
             text_color="white",
             fg_color="transparent",
-            bg_color="transparent",
-            wrap="word",  # Wrap at word boundaries
-            height=50,
-            activate_scrollbars=False,
-            border_width=0,
+            justify="center",  # Center each line
+            anchor="center",
+            wraplength=0,  # Disable UI wrapping (0 = no wrap)
         )
         self.subtitle_textbox.pack(expand=True, fill="both", padx=10, pady=(10, 2))
-        self.subtitle_textbox.configure(state="disabled")  # Read-only
-        # Center text horizontally
-        self.subtitle_textbox.tag_config("center", justify="center")
         
-        # Translation text - separate box with different color
-        self.translation_textbox = ctk.CTkTextbox(
+        # Translation text - separate label with different color
+        self.translation_textbox = ctk.CTkLabel(
             self.container,
+            text="",
             font=ctk.CTkFont(size=20),
             text_color="#90EE90",  # Light green for translation
             fg_color="transparent",
-            bg_color="transparent",
-            wrap="word",
-            height=40,
-            activate_scrollbars=False,
-            border_width=0,
+            justify="center",
+            anchor="center",
+            wraplength=0,  # Disable UI wrapping
         )
         self.translation_textbox.pack(expand=True, fill="both", padx=10, pady=(0, 5))
-        self.translation_textbox.configure(state="disabled")
         self.translation_textbox.pack_forget()  # Hidden by default
-        # Center text horizontally
-        self.translation_textbox.tag_config("center", justify="center")
         
         # Keep reference for compatibility
         self.subtitle_label = self.subtitle_textbox
@@ -281,11 +276,8 @@ class SubtitleOverlay(ctk.CTkToplevel):
         self._current_text = text
         self._language = language
         
-        # Update original text
-        self.subtitle_textbox.configure(state="normal")
-        self.subtitle_textbox.delete("1.0", "end")
-        self.subtitle_textbox.insert("1.0", text, "center")
-        self.subtitle_textbox.configure(state="disabled")
+        # Update original text (CTkLabel uses configure)
+        self.subtitle_textbox.configure(text=text)
         
         # Update translation (only preserve if same text, otherwise clear)
         if translated_text:
@@ -298,13 +290,10 @@ class SubtitleOverlay(ctk.CTkToplevel):
         # Only show translation if we have actual content
         display_translation = translated_text.strip() if translated_text else None
         
-        # Update translation textbox
+        # Update translation label
         if display_translation:
             self.translation_textbox.pack(expand=True, fill="both", padx=15, pady=(0, 10))
-            self.translation_textbox.configure(state="normal")
-            self.translation_textbox.delete("1.0", "end")
-            self.translation_textbox.insert("1.0", display_translation, "center")
-            self.translation_textbox.configure(state="disabled")
+            self.translation_textbox.configure(text=display_translation)
         else:
             # Hide translation box if no translation
             try:
@@ -324,9 +313,8 @@ class SubtitleOverlay(ctk.CTkToplevel):
     
     def clear(self) -> None:
         """Clear the subtitle display."""
-        self.subtitle_textbox.configure(state="normal")
-        self.subtitle_textbox.delete("1.0", "end")
-        self.subtitle_textbox.configure(state="disabled")
+        self.subtitle_textbox.configure(text="")
+        self.translation_textbox.configure(text="")
         self.lang_label.configure(text="")
         self._current_text = ""
         self._language = ""
@@ -357,17 +345,17 @@ class SubtitleOverlay(ctk.CTkToplevel):
                 self._window_height = 180
                 self.subtitle_textbox.configure(
                     font=ctk.CTkFont(size=22, weight="bold"),
-                    height=60,
+                    height=80,
                 )
                 self.translation_textbox.configure(height=60)
             else:
-                # Normal single-line overlay + translation
-                self._window_height = 130
+                # Precise mode - also needs multiline support for long text
+                self._window_height = 150
                 self.subtitle_textbox.configure(
                     font=ctk.CTkFont(size=24, weight="bold"),
-                    height=40,
+                    height=70,  # Taller to accommodate wrapped text
                 )
-                self.translation_textbox.configure(height=40)
+                self.translation_textbox.configure(height=50)
         except Exception:
             pass  # Widget may be destroyed
         

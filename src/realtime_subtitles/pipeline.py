@@ -131,11 +131,68 @@ class RealtimePipeline:
         
         # State
         self._running = False
-        self._transcription_queue: queue.Queue = queue.Queue()
+        # Use a limited queue to prevent unbounded latency
+        # If transcription can't keep up, old segments will be dropped
+        self._transcription_queue: queue.Queue = queue.Queue(maxsize=3)
         self._transcription_thread: Optional[threading.Thread] = None
+        self._dropped_segments = 0  # Track how many segments were dropped
+        
+        # Display state (like realtime mode)
+        self.max_lines = 3  # Maximum lines to display
+        self._lines: list = []  # History of lines
+        self._translation_lines: list = []  # History of translation lines
         
         trans_status = "enabled" if self._translator else "disabled"
         info(f"Pipeline: Initialized model={model}, language={language or 'auto'}, VAD={use_vad}, translation={trans_status}")
+    
+    def _split_into_lines(self, text: str, max_chars_per_line: int = 55) -> list:
+        """
+        Split long text into multiple lines.
+        
+        Args:
+            text: Text to split
+            max_chars_per_line: Maximum characters per line
+            
+        Returns:
+            List of lines
+        """
+        if len(text) <= max_chars_per_line:
+            return [text]
+        
+        lines = []
+        current_line = ""
+        
+        # Split by spaces for English, or character by character for CJK
+        words = text.split(' ')
+        
+        for word in words:
+            # Check if adding this word would exceed the limit
+            test_line = current_line + (' ' if current_line else '') + word
+            
+            if len(test_line) <= max_chars_per_line:
+                current_line = test_line
+            else:
+                # Current line is full
+                if current_line:
+                    lines.append(current_line)
+                
+                # Handle very long words (like CJK text without spaces)
+                if len(word) > max_chars_per_line:
+                    # Split long word into chunks
+                    for i in range(0, len(word), max_chars_per_line):
+                        chunk = word[i:i + max_chars_per_line]
+                        if i + max_chars_per_line < len(word):
+                            lines.append(chunk)
+                        else:
+                            current_line = chunk
+                else:
+                    current_line = word
+        
+        # Don't forget the last line
+        if current_line:
+            lines.append(current_line)
+        
+        return lines
     
     def _default_callback(self, event: SubtitleEvent) -> None:
         """Default subtitle callback - prints to console."""
@@ -148,7 +205,19 @@ class RealtimePipeline:
     def _on_audio_segment(self, audio: np.ndarray) -> None:
         """Callback from Buffer - queues for transcription."""
         debug(f"Pipeline: Audio segment received ({len(audio)/16000:.1f}s)")
-        self._transcription_queue.put(audio)
+        try:
+            # Try to add to queue, but don't block if full
+            self._transcription_queue.put_nowait(audio)
+        except queue.Full:
+            # Queue is full - drop the oldest segment and add new one
+            try:
+                self._transcription_queue.get_nowait()  # Remove oldest
+                self._transcription_queue.put_nowait(audio)  # Add newest
+                self._dropped_segments += 1
+                if self._dropped_segments % 5 == 1:  # Log every 5 drops
+                    warning(f"Pipeline: Dropped {self._dropped_segments} segments (transcription can't keep up)")
+            except queue.Empty:
+                pass
     
     def _transcription_loop(self) -> None:
         """Background thread for transcription."""
@@ -157,6 +226,12 @@ class RealtimePipeline:
                 audio = self._transcription_queue.get(timeout=0.1)
             except queue.Empty:
                 continue
+            
+            # Check if we're falling behind and skip if too many queued
+            queue_size = self._transcription_queue.qsize()
+            if queue_size >= 2:
+                warning(f"Pipeline: Queue backup ({queue_size} segments), skipping older audio")
+                continue  # Skip this segment to catch up
             
             # Skip if too short
             duration = len(audio) / 16000
@@ -170,23 +245,32 @@ class RealtimePipeline:
                 if result.text.strip():
                     text = result.text.strip()
                     
+                    # Split text into lines, keep only last max_lines
+                    lines = self._split_into_lines(text, max_chars_per_line=45)
+                    display_lines = lines[-self.max_lines:]  # Only show last 5 lines
+                    display_text = "\n".join(display_lines)
+                    
                     # Translate if enabled
-                    translated = None
+                    translated_display = None
                     if self._translator:
                         try:
                             translated = self._translator.translate(text)
                             if translated:
-                                debug(f"Pipeline: Translated: {text} -> {translated}")
+                                # Split translation into lines too, keep only last max_lines
+                                trans_lines = self._split_into_lines(translated, max_chars_per_line=45)
+                                trans_display_lines = trans_lines[-self.max_lines:]
+                                translated_display = "\n".join(trans_display_lines)
+                                debug(f"Pipeline: Translated: {text[:30]}... -> {translated[:30]}...")
                         except Exception as e:
                             warning(f"Pipeline: Translation error: {e}")
                     
                     event = SubtitleEvent(
-                        text=text,
+                        text=display_text,
                         language=result.language,
                         confidence=result.confidence,
                         timestamp=time.time(),
-                        translated_text=translated,
-                        target_language=self.target_language if translated else None,
+                        translated_text=translated_display,
+                        target_language=self.target_language if translated_display else None,
                     )
                     self.on_subtitle(event)
             except Exception as e:
@@ -197,6 +281,23 @@ class RealtimePipeline:
         if self._running:
             return
         
+        # Pre-load models BEFORE starting audio capture to avoid queue buildup
+        info("Pipeline: Pre-loading models...")
+        
+        # Load Whisper model (this triggers lazy loading)
+        self._transcriber._ensure_model_loaded()
+        
+        # Pre-load translation model if enabled
+        if self._translator:
+            try:
+                # Warm up translator with a test translation
+                self._translator.translate("test")
+                info("Pipeline: Translation model ready")
+            except Exception as e:
+                warning(f"Pipeline: Translation warmup failed: {e}")
+        
+        info("Pipeline: All models loaded, starting audio capture...")
+        
         self._running = True
         
         # Start transcription thread
@@ -206,13 +307,13 @@ class RealtimePipeline:
         )
         self._transcription_thread.start()
         
-        # Start audio capture
+        # Start audio capture AFTER models are loaded
         self._audio_capture.start(callback=self._on_audio)
         
         info("Pipeline: Started")
     
     def stop(self) -> None:
-        """Stop the pipeline."""
+        """Stop the pipeline and release resources."""
         self._running = False
         
         self._audio_capture.stop()
@@ -227,6 +328,37 @@ class RealtimePipeline:
                 self._transcription_queue.get_nowait()
             except queue.Empty:
                 break
+        
+        # Release Whisper model to free CUDA memory
+        if hasattr(self, '_transcriber') and self._transcriber:
+            if hasattr(self._transcriber, '_model') and self._transcriber._model is not None:
+                del self._transcriber._model
+                self._transcriber._model = None
+                info("Pipeline: Released Whisper model")
+        
+        # Release translator model
+        if hasattr(self, '_translator') and self._translator:
+            if hasattr(self._translator, 'model'):
+                del self._translator.model
+            if hasattr(self._translator, 'tokenizer'):
+                del self._translator.tokenizer
+            self._translator = None
+            info("Pipeline: Released translator model")
+        
+        # Clear CUDA cache
+        try:
+            import torch
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                info("Pipeline: Cleared CUDA cache")
+        except ImportError:
+            pass
+        except Exception as e:
+            warning(f"Pipeline: Failed to clear CUDA cache: {e}")
+        
+        # Clear display history
+        self._lines = []
+        self._translation_lines = []
         
         info("Pipeline: Stopped")
     
