@@ -80,7 +80,7 @@ class SubtitleOverlay(QWidget):
         """Create the UI elements."""
         # Main layout
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setContentsMargins(2, 2, 2, 2)
         layout.setSpacing(0)
         
         # Container frame with dark background
@@ -96,7 +96,7 @@ class SubtitleOverlay(QWidget):
         
         # Container layout
         container_layout = QVBoxLayout(self.container)
-        container_layout.setContentsMargins(15, 10, 15, 10)
+        container_layout.setContentsMargins(8, 6, 8, 6)
         container_layout.setSpacing(5)
         
         # Subtitle label (main text)
