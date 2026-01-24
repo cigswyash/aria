@@ -98,8 +98,15 @@ ARIA includes CUDA 12.1 runtime, so **you don't need to install CUDA separately*
 
 ### Translation
 
-- **Google Cloud**: Fast, accurate, requires internet
-- **NLLB Local**: Offline, runs locally using Meta's NLLB model
+**Local Models (Offline):**
+- **NLLB-200**: Meta's multilingual translation model, supports 200+ languages, runs locally
+
+**Online Services (Free APIs):**
+- **Google Translate**: Fast and accurate, via web scraping
+- **Bing Translator**: Microsoft's translation service
+- **Youdao**: 有道翻譯 (specialized for Chinese-English translation)
+
+> 💡 **Note**: Online services use web scraping and may be subject to rate limiting. Local NLLB model recommended for reliability.
 
 ## Package Structure
 
@@ -128,8 +135,9 @@ cd aria
 python -m venv venv
 venv\Scripts\activate
 
-# Install the package
+# Install dependencies
 pip install -e .
+pip install PyQt6  # UI framework
 
 # Run
 python -m realtime_subtitles.ui.app
@@ -143,6 +151,8 @@ This project is licensed under the **GNU General Public License v3.0** - see the
 - [Faster Whisper](https://github.com/SYSTRAN/faster-whisper)
 - [Sherpa-ONNX](https://github.com/k2-fsa/sherpa-onnx)
 - [Vosk](https://alphacephei.com/vosk/)
+- [PyQt6](https://www.riverbankcomputing.com/software/pyqt/)
+- [PyAudioWPatch](https://github.com/s0d3s/PyAudioWPatch)
 
 ## Contact
 
