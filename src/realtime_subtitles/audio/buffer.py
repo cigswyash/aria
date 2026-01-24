@@ -94,7 +94,8 @@ class StreamingAudioBuffer:
             maxlen=int(self.SAMPLE_RATE * speech_pad_ms / 1000)
         )
         
-        print(f"[Buffer] Initialized: min={min_segment_duration}s, max={max_segment_duration}s, VAD={use_vad}")
+        from ..logger import debug
+        debug(f"Buffer: Initialized min={min_segment_duration}s, max={max_segment_duration}s, VAD={use_vad}")
     
     def _get_buffer_duration(self) -> float:
         """Get current buffer duration in seconds."""

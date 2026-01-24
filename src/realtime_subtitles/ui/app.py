@@ -2,7 +2,7 @@
 Main Application using PyQt6 - Coordinates settings window, overlay, and pipeline.
 """
 
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import QTimer, QObject, pyqtSignal
 import threading
@@ -14,10 +14,9 @@ from .settings_window import SettingsWindow
 from .subtitle_overlay import SubtitleOverlay
 from .system_tray import SystemTray
 from ..pipeline import RealtimePipeline, SubtitleEvent
-from ..vosk_pipeline import VoskStreamingPipeline
+from ..vosk_pipeline import StreamingPipeline
 from ..model_manager import ModelManager, ModelType, ModelStatus
 from ..i18n import t
-from PyQt6.QtWidgets import QMessageBox
 
 
 class PipelineSignals(QObject):
@@ -38,7 +37,7 @@ class App:
         self._settings_window: Optional[SettingsWindow] = None
         self._overlay: Optional[SubtitleOverlay] = None
         self._translation_overlay: Optional[SubtitleOverlay] = None
-        self._pipeline: Optional[Union[RealtimePipeline, VoskStreamingPipeline]] = None
+        self._pipeline: Optional[Union[RealtimePipeline, StreamingPipeline]] = None
         self._tray: Optional[SystemTray] = None
         self._is_running = False
         self._last_settings: Optional[dict] = None
@@ -165,7 +164,7 @@ class App:
                 if self._is_streaming_mode:
                     # Use streaming pipeline
                     lang = settings.get("language") or "zh"  # Default to zh if None
-                    self._pipeline = VoskStreamingPipeline(
+                    self._pipeline = StreamingPipeline(
                         language=lang,
                         on_subtitle=lambda e: self._signals.subtitle.emit(e),
                         enable_translation=self._enable_translation,

@@ -36,12 +36,15 @@ class SettingsManager:
                     saved = json.load(f)
                 # Merge with defaults (in case new settings were added)
                 self._settings = {**self.DEFAULT_SETTINGS, **saved}
-                print(f"[Settings] Loaded from {self._config_file}")
+                from .logger import info
+                info(f"Settings: Loaded from {self._config_file}")
             except Exception as e:
-                print(f"[Settings] Failed to load: {e}")
+                from .logger import warning
+                warning(f"Settings: Failed to load: {e}")
                 self._settings = self.DEFAULT_SETTINGS.copy()
         else:
-            print("[Settings] Using defaults (no saved settings)")
+            from .logger import info
+            info("Settings: Using defaults (no saved settings)")
     
     def save(self) -> None:
         """Save settings to file."""
@@ -49,9 +52,11 @@ class SettingsManager:
             self._config_dir.mkdir(parents=True, exist_ok=True)
             with open(self._config_file, "w", encoding="utf-8") as f:
                 json.dump(self._settings, f, ensure_ascii=False, indent=2)
-            print(f"[Settings] Saved to {self._config_file}")
+            from .logger import debug
+            debug(f"Settings: Saved to {self._config_file}")
         except Exception as e:
-            print(f"[Settings] Failed to save: {e}")
+            from .logger import error
+            error(f"Settings: Failed to save: {e}")
     
     def get(self, key: str, default=None):
         """Get a setting value."""

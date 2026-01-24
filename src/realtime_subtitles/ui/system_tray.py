@@ -125,7 +125,8 @@ class SystemTray:
         self._thread = threading.Thread(target=self._icon.run, daemon=True)
         self._thread.start()
         
-        print("[SystemTray] Started")
+        from ..logger import info
+        info("SystemTray: Started")
     
     def stop(self) -> None:
         """Stop the system tray icon."""
@@ -134,7 +135,8 @@ class SystemTray:
             self._icon = None
         
         self._is_running = False
-        print("[SystemTray] Stopped")
+        from ..logger import info
+        info("SystemTray: Stopped")
     
     def update_status(self, is_active: bool) -> None:
         """

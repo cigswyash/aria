@@ -52,7 +52,8 @@ class VoiceActivityDetector:
     
     def _load_model(self) -> None:
         """Load Silero VAD model."""
-        print("[VAD] Loading Silero VAD model...")
+        from ..logger import info
+        info("VAD: Loading Silero VAD model...")
         
         self._model, _ = torch.hub.load(
             repo_or_dir='snakers4/silero-vad',
@@ -63,7 +64,7 @@ class VoiceActivityDetector:
         )
         self._model.reset_states()
         
-        print("[VAD] Silero VAD loaded")
+        info("VAD: Silero VAD model loaded")
     
     def _get_probability(self, chunk: np.ndarray) -> float:
         """Get speech probability for a 512-sample chunk."""
